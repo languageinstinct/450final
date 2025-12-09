@@ -35,7 +35,6 @@ def load_data(path="fema_sample_stratified.csv"):
     # clean state codes
     df["damagedStateAbbreviation"] = df["damagedStateAbbreviation"].astype(str).str.strip()
 
-    # return cleaned data
     return df
 
 # load dataframe
@@ -60,29 +59,42 @@ else:
 
 st.markdown(f"### Records after filters: {len(df_filtered):,}")
 
-# histogram of repair amount
-st.subheader("Repair Amount Distribution")
+# histogram section with log scale
+st.subheader("Repair amount distribution")
+
 fig_hist = px.histogram(
     df_filtered,
     x="repairAmount",
-    nbins=40,
-    title="Distribution of Repair Amount"
+    nbins=60,
+    height=400,
+    title="Distribution of repair amount (log scale)"
 )
-st.plotly_chart(fig_hist, use_container_width=True)
 
-# boxplot for tsa eligibility
-st.subheader("Repair Amount by TSA Eligibility")
+fig_hist.update_xaxes(type="log")
+
+col1, col2 = st.columns([3, 1])
+with col1:
+    st.plotly_chart(fig_hist, use_container_width=True)
+
+# boxplot section
+st.subheader("Repair amount by TSA eligibility")
+
 fig_box = px.box(
     df_filtered,
     x="tsaEligible",
     y="repairAmount",
-    labels={"tsaEligible": "TSA Eligible (1 yes, 0 no)", "repairAmount": "Repair Amount"},
-    title="Repair Amount by TSA Eligibility"
+    height=430,
+    labels={"tsaEligible": "TSA eligible (1 yes, 0 no)", "repairAmount": "Repair amount"},
+    title="Repair amount by TSA eligibility"
 )
-st.plotly_chart(fig_box, use_container_width=True)
 
-# bar chart for tsa rate by state
-st.subheader("TSA Eligibility Rate by State")
+col3, col4 = st.columns([3, 1])
+with col3:
+    st.plotly_chart(fig_box, use_container_width=True)
+
+# bar chart section
+st.subheader("TSA eligibility rate by state")
+
 tsa_rate = (
     df_filtered.groupby("damagedStateAbbreviation")["tsaEligible"]
     .mean()
@@ -94,16 +106,20 @@ fig_state = px.bar(
     tsa_rate,
     x="damagedStateAbbreviation",
     y="tsa_rate",
-    title="TSA Eligibility Rate by State or Territory"
+    height=450,
+    title="TSA eligibility rate by state or territory"
 )
-st.plotly_chart(fig_state, use_container_width=True)
+
+col5, col6 = st.columns([3, 1])
+with col5:
+    st.plotly_chart(fig_state, use_container_width=True)
 
 # text summary
 st.markdown(
     """
-The histogram shows the distribution of repair amounts.
-The boxplot compares repair amounts for people who were TSA eligible.
-The bar chart shows how TSA eligibility rates changed across states.
+the histogram uses a log scale on repair amount so the skewed distribution is easier to see.  
+the boxplot compares repair amounts for people who were tsa eligible versus not eligible.  
+the bar chart shows how tsa eligibility rates change across states in the sample.  
 """
 )
 
