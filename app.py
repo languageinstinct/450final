@@ -10,7 +10,7 @@ st.set_page_config(
 st.title("FEMA TSA Eligibility Dashboard")
 
 @st.cache_data
-def load_data(path="IndividualAssistanceHousingRegistrantsLargeDisasters.csv"):
+def load_data(path="fema_sample.csv"):
     df = pd.read_csv(
         path,
         low_memory=False,
